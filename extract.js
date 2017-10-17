@@ -4,7 +4,7 @@ const utils = require('loader-utils');
 const sass = require('node-sass');
 const scssParser = require('scss-parser');
 const createQueryWrapper = require('query-ast');
-const isArray = require('lodash.isarray');
+const isArray = require('lodash/isArray');
 
 function cleanAST(ast) {
   if (isArray(ast)) {
@@ -68,7 +68,7 @@ function convertSASSValue(v) {
   if (v instanceof sass.types.Map) {
     const map = {};
     for (let i = 0; i < v.getLength(); i += 1) {
-      const key = v.getKey(i).getValue();
+      const key = convertSASSValue(v.getKey(i));
       const value = convertSASSValue(v.getValue(i));
       map[key] = value;
     }
@@ -94,7 +94,7 @@ function exportSASSValue(vars, name, value) {
   const n = convertSASSValue(name);
   const v = convertSASSValue(value);
   if (n !== undefined || v !== undefined) {
-    vars[n] = v;
+    vars.push([n, v]);
   }
   return value;
 }
@@ -123,7 +123,7 @@ function parseSASS(data, importer, functions) {
 }
 
 function SassVariablesExtract(resourcePath, resolve, sass) {
-    const variables = {};
+    const variables = [];
     const dependencies = [];
 
     try {

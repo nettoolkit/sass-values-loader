@@ -1,10 +1,11 @@
-const loaderUtils = require("loader-utils");
-const SassVariablesExtract = require("./extract.js")
-const forEach = require('lodash.foreach')
+const loaderUtils = require('loader-utils');
+const SassVariablesExtract = require('./extract.js');
+const camelCase = require('lodash/camelCase');
+const fromPairs = require('lodash/fromPairs');
 
 module.exports = function(content) {
   const self = this;
-  const options = loaderUtils.getOptions(self);
+  const opts = loaderUtils.getOptions(self) || {};
   const callback = this.async();
   const version = this.version || 1;
   const resourcePath = this.resourcePath;
@@ -12,40 +13,44 @@ module.exports = function(content) {
 
   this.cacheable && this.cacheable();
 
+  const convertVariables = (variables) => {
+    if (opts.preserveVariableNames) return variables;
+    return variables.map(([k, v]) => [camelCase(k), v]);
+  };
+
   try {
 
     SassVariablesExtract(resourcePath, resolve, content).then((result) => {
       const dependencies = result.dependencies;
-      const variables = result.variables;
-      const defaultExport = JSON.stringify(variables)
+      const variables = convertVariables(result.variables);
+      const defaultExport = JSON.stringify(fromPairs(variables))
                        .replace(/\u2028/g, '\\u2028')
                        .replace(/\u2029/g, '\\u2029');
 
       // Create Module
-      let module = ''
+      let module = '';
       if (version >= 2) {
-        forEach(variables, function (value, name) {
+        variables.forEach(([name, value]) => {
           const constExport = JSON.stringify(value)
                            .replace(/\u2028/g, '\\u2028')
                            .replace(/\u2029/g, '\\u2029');
           module += `export var ${name} = ${constExport}\n`;
-        })
-        module += `export default ${defaultExport}\n`
+        });
+        module += `export default ${defaultExport}\n`;
       } else {
-        module = `module.exports = ${defaultExport}\n`
+        module = `module.exports = ${defaultExport}\n`;
       }
 
       dependencies.forEach((dependency) => {
         self.addDependency(dependency);
-      })
+      });
 
       callback(null, module);
-    })
-    .catch((error) => {
+    }).catch((error) => {
       callback(error);
-    })
+    });
 
-  } catch(error) {
+  } catch (error) {
     callback(error);
   }
 }
