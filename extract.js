@@ -1,9 +1,10 @@
 const path = require('path');
 const fs = require('fs-extra');
+const utils = require('loader-utils');
 const sass = require('node-sass');
 const scssParser = require('scss-parser');
 const createQueryWrapper = require('query-ast');
-const isArray = require('lodash.isarray')
+const isArray = require('lodash.isarray');
 
 function cleanAST(ast) {
   if (isArray(ast)) {
@@ -98,11 +99,14 @@ function exportSASSValue(vars, name, value) {
   return value;
 }
 
-function importSASSFile(start, deps, url, prev) {
-  const prevDir = path.dirname(prev === 'stdin' ? start : prev);
-  const file    = path.resolve(prevDir, url);
-  deps.push(file);
-  return { file: file }
+function createImporter(resourcePath, resolve, deps) {
+  return (url, prev, done) => {
+    const dir = path.dirname(prev === 'stdin' ? resourcePath : prev);
+    resolve(dir, utils.urlToRequest(url), (err, file) => {
+      deps.push(file);
+      done({ file: file });
+    });
+  };
 }
 
 function parseSASS(data, importer, functions) {
@@ -118,15 +122,15 @@ function parseSASS(data, importer, functions) {
   });
 }
 
-function SassVariablesExtract(file, sass) {
+function SassVariablesExtract(resourcePath, resolve, sass) {
     const variables = {};
     const dependencies = [];
 
     try {
       const transformedSass = transformSASSFile(sass)
-      const importer = (url, prev, done) => importSASSFile(file, dependencies, url, prev);
-      const export_var = (name, value) => exportSASSValue(variables, name, value);
-      const functions = { export_var: export_var };
+      const importer = createImporter(resourcePath, resolve, dependencies);
+      const exportVar = (name, value) => exportSASSValue(variables, name, value);
+      const functions = { export_var: exportVar };
       return parseSASS(transformedSass, importer, functions)
         .then(() => {
           return { variables: variables, dependencies: dependencies };

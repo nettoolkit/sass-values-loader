@@ -7,13 +7,14 @@ module.exports = function(content) {
   const options = loaderUtils.getOptions(self);
   const callback = this.async();
   const version = this.version || 1;
-  const path = this.resourcePath;
+  const resourcePath = this.resourcePath;
+  const resolve = this.resolve.bind(this);
 
   this.cacheable && this.cacheable();
 
   try {
 
-    SassVariablesExtract(this.resourcePath, content).then((result) => {
+    SassVariablesExtract(resourcePath, resolve, content).then((result) => {
       const dependencies = result.dependencies;
       const variables = result.variables;
       const defaultExport = JSON.stringify(variables)
