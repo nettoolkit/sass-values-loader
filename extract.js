@@ -76,10 +76,14 @@ function convertSASSValue(v) {
   }
 
   if (v instanceof sass.types.Color) {
-    if (1 === v.getA()) {
-      return 'rgb(' + v.getR() + ', ' + v.getG() + ', ' + v.getB() + ')';
+    const r = Math.round(v.getR());
+    const g = Math.round(v.getG());
+    const b = Math.round(v.getB());
+    const a = v.getA(); // don't round
+    if (1 === a) {
+      return 'rgb(' + r + ', ' + g + ', ' + b + ')';
     } else {
-      return 'rgba(' + v.getR() + ', ' + v.getG() + ', ' + v.getB() + ', ' + v.getA() + ')';
+      return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
     }
   }
 
@@ -105,7 +109,8 @@ function convertSASSValue(v) {
     return v.getValue();
   }
 
-  if (v instanceof sass.types.Null) {
+  // use Singleton instance
+  if (v === sass.types.Null.NULL) {
     return null;
   }
 
@@ -129,8 +134,12 @@ function createImporter(resourcePath, resolve, deps) {
   return (url, prev, done) => {
     const dir = path.dirname(prev === 'stdin' ? resourcePath : prev);
     resolve(dir, utils.urlToRequest(url), (err, file) => {
+      if (err) throw err;
       deps.push(file);
-      done({ file: file });
+      fs.readFile(file, 'utf8', (err, data) => {
+        if (err) throw err;
+        done({ contents: transformSASSFile(data) });
+      });
     });
   };
 }

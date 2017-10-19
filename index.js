@@ -23,6 +23,7 @@ module.exports = function(content) {
     SassVariablesExtract(resourcePath, resolve, content).then((result) => {
       const dependencies = result.dependencies;
       const variables = convertVariables(result.variables);
+      // fromPairs will also eliminate duplicates for us
       const defaultExport = JSON.stringify(fromPairs(variables))
                        .replace(/\u2028/g, '\\u2028')
                        .replace(/\u2029/g, '\\u2029');
@@ -30,7 +31,8 @@ module.exports = function(content) {
       // Create Module
       let module = '';
       if (version >= 2) {
-        variables.forEach(([name, value]) => {
+        // use Map to eliminate duplicates
+        new Map(variables).forEach((value, name) => {
           const constExport = JSON.stringify(value)
                            .replace(/\u2028/g, '\\u2028')
                            .replace(/\u2029/g, '\\u2029');
