@@ -15,37 +15,57 @@ const asyncSassJobQueue = async.queue(sass.render.bind(sass), threadPoolSize - 1
 
 function cleanAST(ast) {
   if (isArray(ast)) {
-    return ast.map(ast, cleanAST)
+    return ast.map(cleanAST);
   }
-  return { type: ast.type, value: ast.value }
+  return { type: ast.type, value: ast.value };
 }
 
 function transformSASSFile(data) {
-  const ast = scssParser.parse(data)
-  const $ = createQueryWrapper(ast)
+  const ast = scssParser.parse(data);
+  const $ = createQueryWrapper(ast);
 
   $().children('declaration').replace((declaration) => {
     const $declaration = $(declaration);
     const $property    = $declaration.children('property').first();
     const $variable    = $property.children('variable').first();
+    const variableName = $variable.value();
 
-    $declaration.children('value').first().replace((v) => {
-        const variableName = $variable.value();
-        const valueAST = cleanAST($(v).get(0));
-        const arguments = [];
-        arguments.push({ type: "string_double", value: variableName })
-        arguments.push({ type: "punctuation", value: "," })
-        arguments.push(valueAST)
-        return {
-          type: "function",
-          value: [
-            { type: "identifier", value: "export_var" },
-            { type: "arguments", value: arguments }
-          ]
-        }
-    })
+    const $value = $declaration.children('value').first();
+    const $bang = $value.children('operator').filter(op => $(op).value() === '!');
+    const $nonSpace = $value.children(/^(?:(?!space).)*$/);
+
+    // index of $bang *within* $nonSpace
+    const bangIndex = $bang.length() && $nonSpace.index($bang.nodes[0]);
+
+    // index of the first non-space item relative to siblings
+    const $first = $nonSpace.first();
+    const firstIndex = $first.index();
+    // index of the last non-space item relative to siblings
+    const lastIndex = (bangIndex ? $nonSpace.eq(bangIndex - 1) : $nonSpace.last()).index();
+
+    const $rm = $value.children().filter((n) => {
+      const idx = $(n).index();
+      return idx > firstIndex && idx <= lastIndex;
+    }).remove();
+
+    $first.replace(() => {
+      const $args = $first.concat($rm);
+      const arguments = [];
+      arguments.push({ type: 'string_double', value: variableName });
+      arguments.push({ type: 'punctuation', value: ',' });
+      arguments.push({ type: 'space', value: ' ' });
+      Array.prototype.push.apply(arguments, cleanAST($args.get()));
+      return {
+        type: 'function',
+        value: [
+          { type: 'identifier', value: 'export_var' },
+          { type: 'arguments', value: arguments },
+        ],
+      };
+    });
+
     return declaration;
-  })
+  });
 
   return scssParser.stringify($().get(0));
 }
@@ -58,8 +78,7 @@ function convertSASSValue(v) {
   if (v instanceof sass.types.Color) {
     if (1 === v.getA()) {
       return 'rgb(' + v.getR() + ', ' + v.getG() + ', ' + v.getB() + ')';
-    }
-    else {
+    } else {
       return 'rgba(' + v.getR() + ', ' + v.getG() + ', ' + v.getB() + ', ' + v.getA() + ')';
     }
   }
@@ -130,21 +149,20 @@ function parseSASS(data, importer, functions) {
 }
 
 function SassVariablesExtract(resourcePath, resolve, sass) {
-    const variables = [];
-    const dependencies = [];
+  const variables = [];
+  const dependencies = [];
 
-    try {
-      const transformedSass = transformSASSFile(sass)
-      const importer = createImporter(resourcePath, resolve, dependencies);
-      const exportVar = (name, value) => exportSASSValue(variables, name, value);
-      const functions = { export_var: exportVar };
-      return parseSASS(transformedSass, importer, functions)
-        .then(() => {
-          return { variables: variables, dependencies: dependencies };
-        })
-    } catch(e) {
-      return Promise.reject(e)
-    }
+  try {
+    const transformedSass = transformSASSFile(sass);
+    const importer = createImporter(resourcePath, resolve, dependencies);
+    const exportVar = (name, value) => exportSASSValue(variables, name, value);
+    const functions = { export_var: exportVar };
+    return parseSASS(transformedSass, importer, functions).then(() => {
+      return { variables: variables, dependencies: dependencies };
+    });
+  } catch(e) {
+    return Promise.reject(e);
+  }
 }
 
 module.exports = SassVariablesExtract;
