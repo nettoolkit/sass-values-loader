@@ -14,14 +14,24 @@ $ms: 500ms;
 $sec: 10s;
 
 // Null
-$null: null;
+$some-null: null;
+
+// This would break
+// $null: 1;
 
 // Strings
 $string: "";
 
-// Data Structures
+// Maps
 $map: (key: 2, key2: true);
+
+// Lists
 $list: (1,2,3);
+$multiline-list: (
+	1,
+	2,
+	3
+);
 
 // Variables depending on imports
 $dependency_var_alias: $dependency_var;
