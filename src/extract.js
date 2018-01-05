@@ -7,6 +7,8 @@ const sass = require('node-sass')
 const createQueryWrapper = require('query-ast')
 const scssParser = require('scss-parser')
 
+const convertSassValue = require('convertSassValue')
+
 // This queue makes sure node-sass leaves one thread available for executing
 // fs tasks when running the custom importer code.
 // This can be removed as soon as node-sass implements a fix for this.
@@ -79,67 +81,9 @@ function transformSASSFile (data) {
 	return scssParser.stringify($().get(0))
 }
 
-function convertSASSValue (v) {
-	if (v instanceof sass.types.Boolean) {
-		return v.getValue()
-	}
-
-	if (v instanceof sass.types.Color) {
-
-		// Round color values
-		const r = Math.round(v.getR())
-		const g = Math.round(v.getG())
-		const b = Math.round(v.getB())
-
-		// Won't round alpha
-		const a = v.getA()
-
-		// Solid color
-		if (a === 1) {
-			return 'rgb(' + r + ', ' + g + ', ' + b + ')'
-		}
-
-		// Color with alpha
-		return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')'
-	}
-
-	if (v instanceof sass.types.List) {
-		const list = []
-		for (let i = 0; i < v.getLength(); i += 1) {
-			list.push(convertSASSValue(v.getValue(i)))
-		}
-		return list
-	}
-
-	if (v instanceof sass.types.Map) {
-		const map = {}
-		for (let i = 0; i < v.getLength(); i += 1) {
-			const key = convertSASSValue(v.getKey(i))
-			const value = convertSASSValue(v.getValue(i))
-			map[key] = value
-		}
-		return map
-	}
-
-	if (v instanceof sass.types.Number) {
-		return v.getValue()
-	}
-
-	// use Singleton instance
-	if (v === sass.types.Null.NULL) {
-		return null
-	}
-
-	if (v instanceof sass.types.String) {
-		return v.getValue()
-	}
-
-	return undefined
-}
-
 function exportSASSValue (vars, name, value) {
-	const n = convertSASSValue(name)
-	const v = convertSASSValue(value)
+	const n = convertSassValue(name)
+	const v = convertSassValue(value)
 	if (n !== undefined || v !== undefined) {
 		vars.push([n, v])
 	}

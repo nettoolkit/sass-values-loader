@@ -2,7 +2,7 @@ const camelCase = require('lodash.camelcase')
 const fromPairs = require('lodash.frompairs')
 const loaderUtils = require('loader-utils')
 
-const SassVariablesExtract = require('./extract.js')
+const SassVariablesExtract = require('./src/extract.js')
 
 module.exports = function (content) {
 	const self = this
