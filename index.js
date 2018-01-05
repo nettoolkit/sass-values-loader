@@ -1,58 +1,73 @@
-const loaderUtils = require('loader-utils');
-const SassVariablesExtract = require('./extract.js');
-const camelCase = require('lodash/camelCase');
-const fromPairs = require('lodash/fromPairs');
+const camelCase = require('lodash.camelcase')
+const fromPairs = require('lodash.frompairs')
+const loaderUtils = require('loader-utils')
 
-module.exports = function(content) {
-  const self = this;
-  const opts = loaderUtils.getOptions(self) || {};
-  const callback = this.async();
-  const version = this.version || 1;
-  const resourcePath = this.resourcePath;
-  const resolve = this.resolve.bind(this);
+const SassVariablesExtract = require('./extract.js')
 
-  this.cacheable && this.cacheable();
+module.exports = function (content) {
+	const self = this
+	const opts = loaderUtils.getOptions(self) || {}
+	const callback = this.async()
+	const version = this.version || 1
+	const resourcePath = this.resourcePath
+	const resolve = this.resolve.bind(this)
 
-  const convertVariables = (variables) => {
-    if (opts.preserveVariableNames) return variables;
-    return variables.map(([k, v]) => [camelCase(k), v]);
-  };
+	this.cacheable && this.cacheable()
 
-  try {
+	const convertVariables = (variables) => {
 
-    SassVariablesExtract(resourcePath, resolve, content).then((result) => {
-      const dependencies = result.dependencies;
-      const variables = convertVariables(result.variables);
-      // fromPairs will also eliminate duplicates for us
-      const defaultExport = JSON.stringify(fromPairs(variables))
-                       .replace(/\u2028/g, '\\u2028')
-                       .replace(/\u2029/g, '\\u2029');
+		if (opts.preserveVariableNames) {
+			return variables
+		}
 
-      // Create Module
-      let module = '';
-      if (version >= 2) {
-        // use Map to eliminate duplicates
-        new Map(variables).forEach((value, name) => {
-          const constExport = JSON.stringify(value)
-                           .replace(/\u2028/g, '\\u2028')
-                           .replace(/\u2029/g, '\\u2029');
-          module += `export var ${name} = ${constExport}\n`;
-        });
-        module += `export default ${defaultExport}\n`;
-      } else {
-        module = `module.exports = ${defaultExport}\n`;
-      }
+		return variables.map(([k, v]) => {
+			return [camelCase(k), v]
+		})
+	}
 
-      dependencies.forEach((dependency) => {
-        self.addDependency(dependency);
-      });
+	try {
 
-      callback(null, module);
-    }).catch((error) => {
-      callback(error);
-    });
+		SassVariablesExtract(resourcePath, resolve, content).then((result) => {
+			const dependencies = result.dependencies
+			const variables = convertVariables(result.variables)
 
-  } catch (error) {
-    callback(error);
-  }
+			// fromPairs will also eliminate duplicates for us
+			const defaultExport = JSON.stringify(fromPairs(variables))
+				.replace(/\u2028/g, '\\u2028')
+				.replace(/\u2029/g, '\\u2029')
+
+			// Create Module code
+			let module = ''
+
+			// Webpack 2+
+			if (version >= 2) {
+
+				// use Map to eliminate duplicates
+				new Map(variables).forEach((value, name) => {
+					const constExport = JSON.stringify(value)
+						.replace(/\u2028/g, '\\u2028')
+						.replace(/\u2029/g, '\\u2029')
+					module += `export var ${name} = ${constExport}\n`
+				})
+
+				module += `export default ${defaultExport}\n`
+
+			// Webpack 1
+			} else {
+				module = `module.exports = ${defaultExport}\n`
+			}
+
+			// Register dependencies dynamically
+			dependencies.forEach((dependency) => {
+				self.addDependency(dependency)
+			})
+
+			callback(null, module)
+		}).catch((error) => {
+			callback(error)
+		})
+
+	} catch (error) {
+		callback(error)
+	}
 }
