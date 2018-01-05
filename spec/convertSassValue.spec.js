@@ -9,6 +9,22 @@ describe('number', () => {
 		)).toBe(10)
 	})
 
+	test('int becomes int', () => {
+		expect(convertSassValue(
+			new sass.types.Number(1)
+		)).toBe(1)
+	})
+
+	test('float becomes float', () => {
+		expect(convertSassValue(
+			new sass.types.Number(0.5)
+		)).toBe(0.5)
+	})
+
+})
+
+describe('unit', () => {
+
 	test('px becomes number', () => {
 		expect(convertSassValue(
 			new sass.types.Number(10, 'px')
