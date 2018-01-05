@@ -2,7 +2,8 @@ const camelCase = require('lodash.camelcase')
 const fromPairs = require('lodash.frompairs')
 const loaderUtils = require('loader-utils')
 
-const SassVariablesExtract = require('./src/extract.js')
+const generateModuleExportValues = require('./src/generateModuleExportValues')
+const extractSassVariables = require('./src/extract.js')
 
 module.exports = function (content) {
 	const self = this
@@ -27,14 +28,12 @@ module.exports = function (content) {
 
 	try {
 
-		SassVariablesExtract(resourcePath, resolve, content).then((result) => {
+		extractSassVariables(resourcePath, resolve, content).then((result) => {
 			const dependencies = result.dependencies
 			const variables = convertVariables(result.variables)
 
 			// fromPairs will also eliminate duplicates for us
-			const defaultExport = JSON.stringify(fromPairs(variables))
-				.replace(/\u2028/g, '\\u2028')
-				.replace(/\u2029/g, '\\u2029')
+			const defaultExport = generateModuleExportValues(fromPairs(variables))
 
 			// Create Module code
 			let module = ''
@@ -44,9 +43,7 @@ module.exports = function (content) {
 
 				// use Map to eliminate duplicates
 				new Map(variables).forEach((value, name) => {
-					const constExport = JSON.stringify(value)
-						.replace(/\u2028/g, '\\u2028')
-						.replace(/\u2029/g, '\\u2029')
+					const constExport = generateModuleExportValues(value)
 					module += `export var ${name} = ${constExport}\n`
 				})
 
