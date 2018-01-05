@@ -6,7 +6,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint --ext .js ./",
-    "example": "webpack-dev-server --inline --progress --config webpack.config.js"
+    "sample": "npm run sample:build",
+    "sample:build": "webpack --config webpack.config.js",
+    "sample:dev": "webpack-dev-server --inline --progress --config webpack.config.js"
   },
   "license": "MIT",
   "dependencies": {

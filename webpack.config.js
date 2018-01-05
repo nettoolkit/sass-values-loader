@@ -7,7 +7,7 @@ module.exports = {
 		js: path.join(__dirname, '/example/index.js')
 	},
 	output: {
-		path: path.join(__dirname, '/example/output/'),
+		path: path.join(__dirname, '/example/dist/'),
 		filename: 'index.js'
 	},
 	resolveLoader: {
