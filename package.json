@@ -10,8 +10,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "async": "^2.5.0",
-    "fs-extra": "^3.0.1",
+    "async": "^2.6.0",
+    "fs-extra": "^5.0.0",
     "loader-utils": "^1.1.0",
     "lodash.camelcase": "^4.3.0",
     "lodash.foreach": "^4.5.0",
