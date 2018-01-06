@@ -1,13 +1,13 @@
 const async = require('async')
 const path = require('path')
-const fs = require('fs-extra')
-const utils = require('loader-utils')
+// const fs = require('fs-extra')
+// const utils = require('loader-utils')
 const isArray = require('lodash.isarray')
 const sass = require('node-sass')
 const createQueryWrapper = require('query-ast')
 const scssParser = require('scss-parser')
 
-const convertSassValue = require('convertSassValue')
+const convertSassValue = require('./convertSassValue')
 
 // This queue makes sure node-sass leaves one thread available for executing
 // fs tasks when running the custom importer code.
@@ -90,19 +90,41 @@ function exportSASSValue (vars, name, value) {
 	return value
 }
 
-function createImporter (resourcePath, resolve, deps) {
-	return (url, prev, done) => {
-		const dir = path.dirname(prev === 'stdin' ? resourcePath : prev)
-		resolve(dir, utils.urlToRequest(url), (err, file) => {
-			if (err) throw err
-			deps.push(file)
-			fs.readFile(file, 'utf8', (e, data) => {
-				if (e) throw e
-				done({ contents: transformSASSFile(data) })
-			})
-		})
+// function createImporter (resourcePath, resolve, deps) {
+// 	return (url, prev, done) => {
+// 		const dir = path.dirname(prev === 'stdin' ? resourcePath : prev)
+// 		resolve(dir, utils.urlToRequest(url), (err, file) => {
+
+// 			if (err) {
+// 				throw err
+// 			}
+
+// 			deps.push(file)
+
+// 			fs.readFile(file, 'utf8', (e, data) => {
+
+// 				if (e) {
+// 					throw e
+// 				}
+
+// 				done({
+// 					contents: transformSASSFile(data)
+// 				})
+
+// 			})
+// 		})
+// 	}
+// }
+
+function importSASSFile (start, deps, url, prev) {
+	const prevDir = path.dirname(prev === 'stdin' ? start : prev)
+	const file = path.resolve(prevDir, url)
+	deps.push(file)
+	return {
+		file
 	}
 }
+
 
 function parseSASS (data, importer, functions) {
 	return new Promise((resolve, reject) => {
@@ -126,7 +148,10 @@ function SassVariablesExtract (resourcePath, resolve, sassData) {
 	try {
 		const transformedSass = transformSASSFile(sassData)
 
-		const importer = createImporter(resourcePath, resolve, dependencies)
+		// const importer = createImporter(resourcePath, resolve, dependencies)
+		const importer = (url, prev, done) => {
+			return importSASSFile(resourcePath, dependencies, url, prev)
+		}
 
 		const exportVar = (name, value) => {
 			return exportSASSValue(variables, name, value)
@@ -136,7 +161,11 @@ function SassVariablesExtract (resourcePath, resolve, sassData) {
 			export_var: exportVar
 		}
 
-		return parseSASS(transformedSass, importer, functions).then(() => {
+		return parseSASS(
+			transformedSass,
+			importer,
+			functions
+		).then(() => {
 			return {
 				variables,
 				dependencies
