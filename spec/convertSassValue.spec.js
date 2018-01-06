@@ -1,3 +1,4 @@
+const isArray = require('lodash.isarray')
 const sass = require('node-sass')
 const convertSassValue = require('../src/convertSassValue')
 
@@ -126,16 +127,22 @@ describe('string', () => {
 
 describe('color', () => {
 
-	test('without alpha becomes rgb', () => {
-		expect(convertSassValue(
+	test('becomes array', () => {
+		expect(isArray(convertSassValue(
 			new sass.types.Color(0, 0, 0, 1)
-		)).toBe('rgb(0, 0, 0)')
+		))).toBe(true)
 	})
 
-	test('with alpha becomes rgba', () => {
+	test('returns alpha when included', () => {
 		expect(convertSassValue(
-			new sass.types.Color(0, 0, 0, 0.5)
-		)).toBe('rgba(0, 0, 0, 0.5)')
+			new sass.types.Color(0, 0, 0, 1)
+		)[3]).toBe(1)
+	})
+
+	test('returns alpha when not included', () => {
+		expect(convertSassValue(
+			new sass.types.Color(0, 0, 0)
+		).length).toBe(4)
 	})
 
 })

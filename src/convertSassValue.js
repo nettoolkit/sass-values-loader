@@ -20,24 +20,39 @@ function convertStringValue (v) {
 	return v.getValue()
 }
 
+// // Standardise color value: always return rgba or rgb string
+// function convertColorValueToString (v) {
+
+// 	// Round color values
+// 	const r = Math.round(v.getR())
+// 	const g = Math.round(v.getG())
+// 	const b = Math.round(v.getB())
+
+// 	// Won't round alpha
+// 	const a = v.getA()
+
+// 	// Solid color
+// 	if (a === 1) {
+// 		return 'rgb(' + r + ', ' + g + ', ' + b + ')'
+// 	}
+
+// 	// Color with alpha
+// 	return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')'
+// }
+
 // Standardise color value: always return rgba or rgb string
-function convertColorValue (v) {
+function convertColorValueToArray (v) {
+	return [
 
-	// Round color values
-	const r = Math.round(v.getR())
-	const g = Math.round(v.getG())
-	const b = Math.round(v.getB())
+		// Round color values
+		Math.round(v.getR()),
+		Math.round(v.getG()),
+		Math.round(v.getB()),
 
-	// Won't round alpha
-	const a = v.getA()
+		// Won't round alpha
+		v.getA()
 
-	// Solid color
-	if (a === 1) {
-		return 'rgb(' + r + ', ' + g + ', ' + b + ')'
-	}
-
-	// Color with alpha
-	return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')'
+	]
 }
 
 // Standardise list value
@@ -69,7 +84,8 @@ function convertSassValue (v) {
 	}
 
 	if (v instanceof sass.types.Color) {
-		return convertColorValue(v)
+		// return convertColorValueToString(v)
+		return convertColorValueToArray(v)
 	}
 
 	if (v instanceof sass.types.List) {
