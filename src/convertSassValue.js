@@ -41,18 +41,23 @@ function convertStringValue (v) {
 // }
 
 // Standardise color value: always return rgba or rgb string
-function convertColorValueToArray (v) {
-	return [
+function convertColorValueToObject (v) {
 
-		// Round color values
-		Math.round(v.getR()),
-		Math.round(v.getG()),
-		Math.round(v.getB()),
+	// Round color values
+	const r = Math.round(v.getR())
+	const g = Math.round(v.getG())
+	const b = Math.round(v.getB())
 
-		// Won't round alpha
-		v.getA()
+	// Won't round alpha
+	const a = v.getA()
 
-	]
+	return {
+		r,
+		g,
+		b,
+		a,
+		rgba: `rgba(${r}, ${g}, ${b}, ${a})`
+	}
 }
 
 // Standardise list value
@@ -85,7 +90,7 @@ function convertSassValue (v) {
 
 	if (v instanceof sass.types.Color) {
 		// return convertColorValueToString(v)
-		return convertColorValueToArray(v)
+		return convertColorValueToObject(v)
 	}
 
 	if (v instanceof sass.types.List) {

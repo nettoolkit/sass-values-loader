@@ -113,6 +113,7 @@ describe('time', () => {
 })
 
 
+
 describe('string', () => {
 
 	test('becomes string', () => {
@@ -126,23 +127,52 @@ describe('string', () => {
 
 
 describe('color', () => {
+	const testColor = convertSassValue(new sass.types.Color(8, 16, 32))
+	const testColorAlpha = convertSassValue(new sass.types.Color(8, 16, 32, 0.5))
+	const testColorTransparent = convertSassValue(new sass.types.Color(8, 16, 32, 0))
 
-	test('becomes array', () => {
-		expect(isArray(convertSassValue(
-			new sass.types.Color(0, 0, 0, 1)
-		))).toBe(true)
+	test('has r', () => {
+		expect(testColor.r).toBe(8)
 	})
 
-	test('returns alpha when included', () => {
-		expect(convertSassValue(
-			new sass.types.Color(0, 0, 0, 1)
-		)[3]).toBe(1)
+	test('has g', () => {
+		expect(testColor.g).toBe(16)
 	})
 
-	test('returns alpha when not included', () => {
-		expect(convertSassValue(
-			new sass.types.Color(0, 0, 0)
-		).length).toBe(4)
+	test('has b', () => {
+		expect(testColor.b).toBe(32)
+	})
+
+	test('has a', () => {
+		expect(testColor.a).toBe(1)
+	})
+
+	test('has solid a', () => {
+		expect(testColor.a).toBe(1)
+	})
+
+	test('has float a', () => {
+		expect(testColorAlpha.a).toBe(0.5)
+	})
+
+	test('has transparent a', () => {
+		expect(testColorTransparent.a).toBe(0)
+	})
+
+	test('has rgba string', () => {
+		expect(typeof testColor.rgba).toBe('string')
+	})
+
+	test('has correct rgba formatting when solid', () => {
+		expect(testColor.rgba).toBe('rgba(8, 16, 32, 1)')
+	})
+
+	test('has correct rgba formatting when half transparent', () => {
+		expect(testColorAlpha.rgba).toBe('rgba(8, 16, 32, 0.5)')
+	})
+
+	test('has correct rgba formatting when transparent', () => {
+		expect(testColorTransparent.rgba).toBe('rgba(8, 16, 32, 0)')
 	})
 
 })
