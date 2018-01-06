@@ -9,6 +9,9 @@ function convertBooleanValue (v) {
 
 // Standardise number
 function convertNumberValue (v) {
+	if (v.getUnit() === 's') {
+		return v.getValue() * 1000
+	}
 	return v.getValue()
 }
 

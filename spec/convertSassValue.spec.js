@@ -103,10 +103,10 @@ describe('time', () => {
 		)).toBe('number')
 	})
 
-	test('s does not become milliseconds', () => {
+	test('s becomes seconds', () => {
 		expect(convertSassValue(
 			new sass.types.Number(1, 's')
-		)).toBe(1)
+		)).toBe(1000)
 	})
 
 })
