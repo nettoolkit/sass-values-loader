@@ -1,19 +1,19 @@
-# `sass-vars-to-js`
+# `sass-vars-to-js-loader`
 
-`sass-vars-to-js` is a Webpack loader that allows you share the values of your Sass files with your javascript when using webpack.
+`sass-vars-to-js-loader` is a Webpack loader that allows you share the values of your Sass files with your javascript when using webpack.
 
 This module is a fork of [`sass-values-loader`](https://www.npmjs.com/package/sass-values-loader).
 
 ## Installation
 
 ```sh
-npm install --save-dev sass-vars-to-js node-sass
+npm install --save-dev sass-vars-to-js-loader node-sass
 ```
 
 or if you use yarn
 
 ```sh
-yarn add --dev sass-vars-to-js node-sass
+yarn add --dev sass-vars-to-js-loader node-sass
 ```
 
 as a peer dependency you need to install `node-sass` if you don't have it already
@@ -42,7 +42,7 @@ in your JavaScript file (wherever you need the values from Sass), you can do thi
 
 ```js
 import styles from './style.scss';
-import vars from '!!sass-vars-to-js!./style.scss';
+import vars from '!!sass-vars-to-js-loader!./style.scss';
 
 console.log(vars.bool) // true
 console.log(vars.color) // { r: 255, g: 0, b: 0, a: 1, rgba: 'rgba(255, 0, 0, 0)' }
@@ -63,7 +63,7 @@ You can, however, clean up the syntax. First, add an alias in your Webpack confi
 // ...
 resolveLoader: {
 	alias: {
-		'sass-to-js': 'sass-vars-to-js',
+		'sass-to-js': 'sass-vars-to-js-loader',
 	},
 },
 // ...
@@ -88,8 +88,8 @@ $some-time: 500ms,
 
 ```js
 import styles from './style.scss';
-import camelCasedVars from '!!sass-vars-to-js!./style.scss';
-import preservedVars from '!!sass-vars-to-js?preserveKeys=true!./style.scss';
+import camelCasedVars from '!!sass-vars-to-js-loader!./style.scss';
+import preservedVars from '!!sass-vars-to-js-loader?preserveKeys=true!./style.scss';
 
 console.log(camelCasedVars) // { someTime: 500 }
 console.log(preservedVars) // { 'some-time': 500 }
