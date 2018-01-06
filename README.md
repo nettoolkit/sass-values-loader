@@ -28,7 +28,7 @@ $color: red;
 $list: (1,2,3);
 $number: 1;
 $map: (key: 2, key2: true);
-$null: null;
+$null-value: null; // `$null` would break
 $string: 'string value';
 $ms: 500ms;
 $sec: 10s;
@@ -48,6 +48,8 @@ console.log(vars.bool) // true
 console.log(vars.color) // { r: 255, g: 0, b: 0, a: 1, rgba: 'rgba(255, 0, 0, 0)' }
 console.log(vars.list) // [1,2,3]
 console.log(vars.number) // 1
+console.log(vars.map) // { key: 2, key2: true }
+console.log(vars.nullValue) // null
 console.log(vars.string) // 'string value'
 console.log(vars.ms) // 500
 console.log(vars.sec) // 10
