@@ -17,7 +17,7 @@ module.exports = function (content) {
 
 	const convertVariables = (variables) => {
 
-		if (opts.preserveVariableNames) {
+		if (opts.preserveKeys) {
 			return variables
 		}
 
@@ -44,7 +44,9 @@ module.exports = function (content) {
 				// use Map to eliminate duplicates
 				new Map(variables).forEach((value, name) => {
 					const constExport = generateModuleExportValues(value)
-					module += `export var ${name} = ${constExport}\n`
+
+					// Force camelCase for module names
+					module += `export var ${camelCase(name)} = ${constExport}\n`
 				})
 
 				module += `export default ${defaultExport}\n`
