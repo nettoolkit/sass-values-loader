@@ -4,15 +4,15 @@ const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 
 module.exports = {
 	entry: {
-		js: path.join(__dirname, '/example/index.js')
+		js: path.join(__dirname, '/index.js')
 	},
 	output: {
-		path: path.join(__dirname, '/example/dist/'),
+		path: path.join(__dirname, '/dist/'),
 		filename: 'index.js'
 	},
 	resolveLoader: {
 		alias: {
-			'vars': 'sass-values-loader'
+			'vars': '../'
 		},
 		modules: [
 			'node_modules',
