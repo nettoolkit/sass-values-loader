@@ -1,6 +1,6 @@
 {
   "name": "sass-vars-to-js-loader",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "main": "index.js",
   "scripts": {
     "test": "jest",
@@ -9,11 +9,11 @@
     "sample": "npm run sample:build",
     "sample:build": "webpack --config example/webpack.config.js",
     "sample:dev": "webpack-dev-server --inline --progress --config example/webpack.config.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Eiskis/sass-values-loader.git"
-	},
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eiskis/sass-values-loader.git"
+  },
   "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",
