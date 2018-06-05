@@ -9,7 +9,11 @@
     "sample": "npm run sample:build",
     "sample:build": "webpack --config example/webpack.config.js",
     "sample:dev": "webpack-dev-server --inline --progress --config example/webpack.config.js"
-  },
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Eiskis/sass-values-loader.git"
+	},
   "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",
