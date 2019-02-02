@@ -1,4 +1,3 @@
-const isArray = require('lodash.isarray')
 const sass = require('node-sass')
 const convertSassValue = require('../src/convertSassValue')
 

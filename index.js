@@ -1,5 +1,5 @@
-const camelCase = require('lodash.camelcase')
-const fromPairs = require('lodash.frompairs')
+const camelCase = require('lodash').camelCase
+const fromPairs = require('lodash').fromPairs
 const loaderUtils = require('loader-utils')
 
 const generateModuleExportValues = require('./src/generateModuleExportValues')
