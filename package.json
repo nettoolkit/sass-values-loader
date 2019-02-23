@@ -1,11 +1,7 @@
 {
   "name": "sass-vars-to-js-loader",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "main": "index.js",
-  "engines": {
-    "node": "10.14.2",
-    "npm": "6.4.1"
-  },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
