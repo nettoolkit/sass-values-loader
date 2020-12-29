@@ -158,7 +158,7 @@ function SassVariablesExtract (resourcePath, resolve, sassData) {
 		}
 
 		const functions = {
-			export_var: exportVar
+			'export_var($name, $value, $other...)': exportVar
 		}
 
 		return parseSASS(
