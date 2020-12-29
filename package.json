@@ -29,7 +29,7 @@
     "scss-parser": "^1.0.3"
   },
   "peerDependencies": {
-    "node-sass": "^4.11.0"
+    "sass": "^1.30.0"
   },
   "jest": {
     "testURL": "http://localhost/"
@@ -48,7 +48,7 @@
     "eslint-plugin-standard": "^3.1.0",
     "extract-text-webpack-plugin": "^2.1.2",
     "jest": "^22.4.4",
-    "node-sass": "^4.5.3",
+    "sass": "^1.30.0",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.18.2",
     "webpack": "^3.12.0",

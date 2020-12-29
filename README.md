@@ -7,16 +7,16 @@ This module is a fork of [`sass-values-loader`](https://www.npmjs.com/package/sa
 ## Installation
 
 ```sh
-npm install --save-dev sass-vars-to-js-loader node-sass
+npm install --save-dev sass-vars-to-js-loader sass
 ```
 
 or if you use yarn
 
 ```sh
-yarn add --dev sass-vars-to-js-loader node-sass
+yarn add --dev sass-vars-to-js-loader sass
 ```
 
-as a peer dependency you need to install `node-sass` if you don't have it already
+as a peer dependency you need to install `sass` if you don't have it already
 
 ## Setup & usage
 
@@ -115,7 +115,7 @@ $my_var: export_var(20 + 10);
 
 This is done as the last step, so all the full Sass syntax should be supported.
 
-2. The Sass code is fed through [node-sass](https://github.com/sass/node-sass), while registering the custom `export_var` function. During compilation `node-sass` will call the function with the resolved value and we can capture it then.
+2. The Sass code is fed through [sass](https://github.com/sass/dart-sass), while registering the custom `export_var` function. During compilation `sass` will call the function with the resolved value and we can capture it then.
 
 This way Sass does the resolution of the final values, even if they are computed via functions or if they depend on imported files.
 

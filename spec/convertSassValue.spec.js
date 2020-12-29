@@ -1,4 +1,4 @@
-const sass = require('node-sass')
+const sass = require('sass')
 const convertSassValue = require('../src/convertSassValue')
 
 describe('number', () => {
@@ -205,7 +205,7 @@ describe('singleton', () => {
 describe('list', () => {
 
 	test('becomes empty array', () => {
-		const list = new sass.types.List()
+		const list = new sass.types.List(0) // dart-sass implementation requires an initial value
 		expect(convertSassValue(list)).toEqual([])
 	})
 
@@ -230,7 +230,7 @@ describe('list', () => {
 describe('map', () => {
 
 	test('becomes empty object', () => {
-		const list = new sass.types.Map()
+		const list = new sass.types.Map(0) // dart-sass implementation requires an initial value
 		expect(convertSassValue(list)).toEqual({})
 	})
 

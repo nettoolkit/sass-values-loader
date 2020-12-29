@@ -3,15 +3,15 @@ const path = require('path')
 // const fs = require('fs-extra')
 // const utils = require('loader-utils')
 const isArray = require('lodash').isArray
-const sass = require('node-sass')
+const sass = require('sass')
 const createQueryWrapper = require('query-ast')
 const scssParser = require('scss-parser')
 
 const convertSassValue = require('./convertSassValue')
 
-// This queue makes sure node-sass leaves one thread available for executing
+// This queue makes sure sass leaves one thread available for executing
 // fs tasks when running the custom importer code.
-// This can be removed as soon as node-sass implements a fix for this.
+// This can be removed as soon as sass implements a fix for this.
 const threadPoolSize = process.env.UV_THREADPOOL_SIZE || 4
 const asyncSassJobQueue = async.queue(sass.render.bind(sass), threadPoolSize - 1)
 
